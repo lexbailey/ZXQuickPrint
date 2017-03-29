@@ -5,8 +5,12 @@ from PIL import ImageFont
 from PIL import ImageDraw 
 
 import re
+import math
+import textwrap
 
 font = ImageFont.truetype("/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf", 21)
+
+lineNum = 600
 
 def startAndEndLines(charImg, width, height):
 	start=0
@@ -26,7 +30,7 @@ def startAndEndLines(charImg, width, height):
 		for x in range(width):
 			pixel = charImg.getpixel((x, y))
 			if pixel:
-				end = y
+				end = y+1
 				done=True
 				break
 		if done:
@@ -63,7 +67,50 @@ def doChar(thisChar, startLineNum):
 	lineNum +=1
 	return (output, lineNum-1)
 	
-lineNum = 600
+def lutToBST(lut):
+	if len(lut) == 0:
+		return None
+	if len(lut) == 1:
+		return {"key":list(lut.keys())[0], "value":list(lut.values())[0], "LT":None, "GTE":None}
+	bst = {}
+	keys = sorted(lut.keys())
+	midPoint = math.floor(len(keys)/2)
+	sortedLinenums = [lut[key] for key in keys]
+	leftHalf = {key: lut[key] for key in keys[0:midPoint]}
+	rightHalf = {key: lut[key] for key in keys[midPoint:]}
+	bst['key'] = keys[midPoint]
+	bst['value'] = lut[keys[midPoint]]
+	bst['LT'] = lutToBST(leftHalf)
+	bst['GTE'] = lutToBST(rightHalf)
+	return bst
+
+def printBST(bst, indent=0):
+	if not bst:
+		return
+	print(textwrap.indent("%s: %d" % (bst['key'], bst['value']), " "*indent))
+	printBST(bst['LT'], indent = indent+4)
+	printBST(bst['GTE'], indent = indent+4)
+	
+
+bstSearchCode = ""
+
+def generateBSTSearchCode(bst):
+	global lineNum
+	global bstSearchCode
+	if not bst:
+		return -1
+	if bst['LT'] == None and bst['GTE'] == None:
+		return bst['value']
+
+	ltGoto = generateBSTSearchCode(bst['LT'])
+	gteGoto = generateBSTSearchCode(bst['GTE'])
+	nextLine = lineNum
+	bstSearchCode += ("%d IF a$<CHR$ %d THEN GO TO %d\n" % (nextLine, bst['key'], ltGoto))
+	bstSearchCode += ("%d GO TO %d\n" % (nextLine+1, gteGoto))	
+	lineNum = nextLine+2
+	return nextLine
+
+
 print("%d LPRINT CHR$ 13+CHR$ 10" % (lineNum))
 lineNum +=1
 gosubCallLineNum = lineNum
@@ -75,13 +122,13 @@ for c in range(32, 127):
 	lut[c] = lineNum
 	fontBlock += text
 	lineNum = nextLineNum+1
-lutStart = lineNum
-print("%d GO SUB %d" % (gosubCallLineNum, lutStart))
+bstStart = lineNum
+bst = lutToBST(lut)
+startLine = generateBSTSearchCode(bst)
+print("%d GO SUB %d" % (gosubCallLineNum, startLine))
 print("%d LPRINT CHR$ 13+CHR$ 10" % (gosubCallLineNum+1))
 print("%d RETURN" % (gosubCallLineNum+2))
 print(fontBlock, end='')
-for key, value in lut.items():
-	print("%d IF a$=CHR$ %d THEN GO TO %d" % (lineNum, key, value))
-	lineNum += 1
-print("%d RETURN" % (lineNum))
-lineNum += 1
+print(bstSearchCode, end='')
+
+
