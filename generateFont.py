@@ -59,16 +59,29 @@ def doChar(thisChar, startLineNum):
 				output += " "
 
 		output += "\"\n"
+	output += "%d RETURN\n" % (lineNum)
+	lineNum +=1
 	return (output, lineNum-1)
 	
-lineNum = 510
-print("%d LPRINT CHR$ 13+CHR$ 10" % lineNum)
+lineNum = 600
+print("%d LPRINT CHR$ 13+CHR$ 10" % (lineNum))
 lineNum +=1
+gosubCallLineNum = lineNum
+lineNum +=3
 fontBlock = ""
-for c in range(32, 34):
-	(text, nextLineNum) = doChar(chr(c), lineNum+1)
-	print("%d IF a$<>CHR$ %d THEN GO TO %d" % (lineNum, c, nextLineNum+1))
-	print(text, end='')
+lut = {}
+for c in range(32, 127):
+	(text, nextLineNum) = doChar(chr(c), lineNum)
+	lut[c] = lineNum
+	fontBlock += text
 	lineNum = nextLineNum+1
-print("%d LPRINT CHR$ 13+CHR$ 10" % lineNum)
-lineNum +=1
+lutStart = lineNum
+print("%d GO SUB %d" % (gosubCallLineNum, lutStart))
+print("%d LPRINT CHR$ 13+CHR$ 10" % (gosubCallLineNum+1))
+print("%d RETURN" % (gosubCallLineNum+2))
+print(fontBlock, end='')
+for key, value in lut.items():
+	print("%d IF a$=CHR$ %d THEN GO TO %d" % (lineNum, key, value))
+	lineNum += 1
+print("%d RETURN" % (lineNum))
+lineNum += 1
