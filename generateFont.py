@@ -114,7 +114,7 @@ def generateBSTSearchCode(bst):
 print("%d LPRINT CHR$ 13+CHR$ 10" % (lineNum))
 lineNum +=1
 gosubCallLineNum = lineNum
-lineNum +=3
+lineNum +=4
 fontBlock = ""
 lut = {}
 for c in range(32, 127):
@@ -124,11 +124,13 @@ for c in range(32, 127):
 	lineNum = nextLineNum+1
 bstStart = lineNum
 bst = lutToBST(lut)
-startLine = generateBSTSearchCode(bst)
-print("%d GO SUB %d" % (gosubCallLineNum, startLine))
-print("%d LPRINT CHR$ 13+CHR$ 10" % (gosubCallLineNum+1))
-print("%d RETURN" % (gosubCallLineNum+2))
+#startLine = generateBSTSearchCode(bst)
+print("%d LET i=CODE a$-31" % (gosubCallLineNum))
+print("%d GO SUB e(i)" % (gosubCallLineNum+1))
+print("%d LPRINT CHR$ 13+CHR$ 10" % (gosubCallLineNum+2))
+print("%d RETURN" % (gosubCallLineNum+3))
 print(fontBlock, end='')
-print(bstSearchCode, end='')
+print("%d DATA %s" % (lineNum, ','.join([str(lut[c]) for c in range(32, 127)])))
+lineNum+=1
 
 

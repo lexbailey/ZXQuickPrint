@@ -1,7 +1,11 @@
+1 DIM e(95)
+2 RESTORE
+3 FOR n=1 TO 95: READ e(n): NEXT n
 9 REM Disable token mode
 10 COPY : REM CHR$ 0
 19 REM Reset the printer
-20 LPRINT CHR$ 27
+20 LPRINT CHR$ 27 + "@"
+22 BEEP 1, 0
 25 GO TO 290
 29 REM Call the function that will print the badge
 30 GO SUB 200
@@ -36,7 +40,9 @@
 298 PRINT ""
 299 PRINT ""
 300 PRINT "Type N, B or C"
-310 INPUT "Selection - ", s$
+305 LET s$=INKEY$
+310 IF s$="" THEN GO TO 305
+317 IF INKEY$<>"" THEN GO TO 317
 320 IF s$="n" OR s$="N" THEN GO SUB 30
 330 IF s$="b" OR s$="B" THEN GO SUB 450
 340 IF s$="c" OR s$="c" THEN GO SUB 370
@@ -46,7 +52,7 @@
 370 LPRINT CHR$ 27+"E1"+CHR$ 27+"!0"+CHR$ 27+"a1"
 380 LPRINT "York Hackspace"+CHR$ 13+CHR$ 10
 390 LPRINT CHR$ 27+"E0"+CHR$ 27+"!"+CHR$ 0
-400 LPRINT "Unit 1, 35 Hospital fields road"+CHR$ 13+CHR$ 10+"York, YO10 4DZ"+CHR$ 13+CHR$ 10
+400 LPRINT "Unit 1, 35 Hospital Fields Road"+CHR$ 13+CHR$ 10+"York, YO10 4DZ"+CHR$ 13+CHR$ 10
 410 LPRINT "@yorkhackspace"+CHR$ 13+CHR$ 10
 420 LPRINT "https://york.hackspace.org.uk/"+CHR$ 13+CHR$ 10
 425 LPRINT CHR$ 29+"h"+CHR$ 60
