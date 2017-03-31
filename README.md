@@ -18,6 +18,6 @@ Then you just need to `make printer2_autostart.tap` and you will have a tap file
 
 To load the tap file onto a real spectrum, you will need to convert it to a sound file you can play. This can be done with `tape2wav` which is found in the package `fuse-emulator-utils` on debian or ubuntu.
 
-  sudo apt install fuse-emulator-utils
+    sudo apt install fuse-emulator-utils
 
-  tape2wav printer2_autostart.tap printer2_autostart.wav
+    tape2wav printer2_autostart.tap printer2_autostart.wav
