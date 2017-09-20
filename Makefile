@@ -2,7 +2,13 @@
 # so it doesn't only work on my laptop.
 BAS2TAP=~/bin/bas2tap/bas2tap
 BAS2TAPOPTS=-r -s"printer2"
-printer2.bas: printer2_main.bas font.bas
+SHITIFY=./shitifyBasic.py
+
+
+%.bas.shit: %.bas
+	$(SHITIFY) $<
+
+printer2.bas: printer2_main.bas.shit font.bas
 	cat $^ > $@
 
 font.bas: generateFont.py

@@ -46,7 +46,7 @@ def doChar(thisChar, startLineNum):
 	
 	charImg = Image.new("1", size)
 	charDraw = ImageDraw.Draw(charImg)
-	charDraw.text((0,0), thisChar, (255,255,255), font=font)
+	charDraw.text((0,0), thisChar, "white", font=font)
 	charImg = charImg.rotate(-90, expand=True)
 	lineNum = startLineNum
 	start, end = startAndEndLines(charImg, width, height)
