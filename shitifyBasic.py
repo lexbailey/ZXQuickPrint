@@ -32,7 +32,6 @@ with open(filename) as infile:
             if not m:
                 m = re.match(r"^(.*)GO (SUB|TO) (.*)$", line)
                 if m:
-                    print(m.groups())
                     prefix, action, destlabel = m.groups()
                     if destlabel.startswith("RAWLINE:"):
                         destline = destlabel[8:]
