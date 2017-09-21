@@ -80,10 +80,8 @@ RETURN
 
 REM generated font code will start at line sixhundred
 LABEL: printchar
-GO TO RAWLINE:600
+GO TO RAWLINE:700
 
 REM read the line number data for the font into array e
 LABEL: loadfont
-DIM e(95)
-RESTORE
-FOR n=1 TO 95: READ e(n): NEXT n
+GO TO RAWLINE:600
