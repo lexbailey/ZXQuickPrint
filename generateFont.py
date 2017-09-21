@@ -86,4 +86,4 @@ print(fontBlock, end='')
 print("%d DATA %s" % (lineNum, ','.join([str(lut[c]) for c in range(32, 127)])))
 lineNum+=1
 
-
+# vim: set tabstop=4 noexpandtab:
