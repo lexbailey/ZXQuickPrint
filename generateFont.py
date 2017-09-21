@@ -67,50 +67,6 @@ def doChar(thisChar, startLineNum):
 	lineNum +=1
 	return (output, lineNum-1)
 	
-def lutToBST(lut):
-	if len(lut) == 0:
-		return None
-	if len(lut) == 1:
-		return {"key":list(lut.keys())[0], "value":list(lut.values())[0], "LT":None, "GTE":None}
-	bst = {}
-	keys = sorted(lut.keys())
-	midPoint = math.floor(len(keys)/2)
-	sortedLinenums = [lut[key] for key in keys]
-	leftHalf = {key: lut[key] for key in keys[0:midPoint]}
-	rightHalf = {key: lut[key] for key in keys[midPoint:]}
-	bst['key'] = keys[midPoint]
-	bst['value'] = lut[keys[midPoint]]
-	bst['LT'] = lutToBST(leftHalf)
-	bst['GTE'] = lutToBST(rightHalf)
-	return bst
-
-def printBST(bst, indent=0):
-	if not bst:
-		return
-	print(textwrap.indent("%s: %d" % (bst['key'], bst['value']), " "*indent))
-	printBST(bst['LT'], indent = indent+4)
-	printBST(bst['GTE'], indent = indent+4)
-	
-
-bstSearchCode = ""
-
-def generateBSTSearchCode(bst):
-	global lineNum
-	global bstSearchCode
-	if not bst:
-		return -1
-	if bst['LT'] == None and bst['GTE'] == None:
-		return bst['value']
-
-	ltGoto = generateBSTSearchCode(bst['LT'])
-	gteGoto = generateBSTSearchCode(bst['GTE'])
-	nextLine = lineNum
-	bstSearchCode += ("%d IF a$<CHR$ %d THEN GO TO %d\n" % (nextLine, bst['key'], ltGoto))
-	bstSearchCode += ("%d GO TO %d\n" % (nextLine+1, gteGoto))	
-	lineNum = nextLine+2
-	return nextLine
-
-
 print("%d LPRINT CHR$ 13+CHR$ 10" % (lineNum))
 lineNum +=1
 gosubCallLineNum = lineNum
@@ -122,9 +78,6 @@ for c in range(32, 127):
 	lut[c] = lineNum
 	fontBlock += text
 	lineNum = nextLineNum+1
-bstStart = lineNum
-bst = lutToBST(lut)
-#startLine = generateBSTSearchCode(bst)
 print("%d LET i=CODE a$-31" % (gosubCallLineNum))
 print("%d GO SUB e(i)" % (gosubCallLineNum+1))
 print("%d LPRINT CHR$ 13+CHR$ 10" % (gosubCallLineNum+2))
