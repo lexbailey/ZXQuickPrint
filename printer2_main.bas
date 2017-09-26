@@ -1,6 +1,7 @@
 REM Initialisation
 REM Disable token mode
 COPY : REM CHR$ 0
+CLEAR 30000
 GO SUB loadfont
 GO SUB load_inflate_code
 LABEL: mainmenu
@@ -81,25 +82,31 @@ RETURN
 
 LABEL: printchar
 LET i= CODE a$-31
-LET charAddr=28000+e(i)
+LET charAddr=30000+e(i)
 LABEL: printchar_next
 POKE 32597, PEEK charAddr
-POKE 32598, PEEK charAddr+1
-POKE 32599, PEEK charAddr+2
+POKE 32598, PEEK (charAddr+1)
+POKE 32599, PEEK (charAddr+2)
+PRINT "Char"
+PRINT charAddr
+PRINT PEEK charAddr
+PRINT PEEK (charAddr+1)
+PRINT PEEK (charAddr+2)
 LET charAddr= charAddr+1
-LET r=USR 32475
+REM "LET r=USR 32475"
+LET r=1
 IF r=0 THEN GO TO printchar_next
 RETURN
 
-REM read the line number data for the font into array e
 LABEL: loadfont
 PRINT "Loading font file"
 PRINT "please wait..."
+REM Load the font file from the tape
 LOAD "font"CODE
+REM "read the line number data for the font into array e (autogen at line 600)"
 GO TO RAWLINE:600
 
 LABEL: load_inflate_code
-CLEAR 32474
 LOADASMDATA 32475 inflate_and_print
 REM "Poke the mark and the space characters"
 POKE 32575, 219

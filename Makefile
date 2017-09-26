@@ -22,7 +22,7 @@ printer2_autostart.tap: printer2.bas
 	$(BAS2TAP) -a1 $(BAS2TAPOPTS) $< $@
 
 default_font.tap: fontdata.dat bin2tap/bin2tap
-	./$(word 2,$^) 28000 "font" $<
+	./$(word 2,$^) 30000 "font" $<
 	mv $<.tap $@
 
 fulltape.tap: printer2_autostart.tap default_font.tap
