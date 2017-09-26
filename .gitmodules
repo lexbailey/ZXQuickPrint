@@ -1,0 +1,3 @@
+[submodule "bin2tap"]
+	path = bin2tap
+	url = git@github.com:danieljabailey/bin2tap.git

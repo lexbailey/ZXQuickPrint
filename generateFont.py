@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import sys
+import os
 
 from PIL import Image
 from PIL import ImageFont
@@ -9,11 +10,21 @@ from PIL import ImageDraw
 import re
 import math
 import textwrap
+import argparse
 
-font = ImageFont.truetype("/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf", 21)
+parser = argparse.ArgumentParser(description='Font generator.')
+parser.add_argument('fontfile', help='Path to font')
+args = parser.parse_args()
+print(args.fontfile, file=sys.stderr)
+
+#font = ImageFont.truetype("/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf", 21)
+font = ImageFont.truetype(args.fontfile, 21)
+name = os.path.splitext(os.path.basename(args.fontfile))[0]
+if len(name) > 10:
+	name = name[0:10]
+print(name, file=sys.stderr)
 
 init_start = 600
-printchar_start = 700
 
 def startAndEndLines(charImg, width, height):
 	start=0
@@ -80,6 +91,15 @@ def doChar(thisChar):
 	lines = []
 	for y in range(start, end):
 		lines.append("".join("1" if charImg.getpixel((x, y)) else "0" for x in range(width)))
+	if lines == []:
+		lines = ["010101010101010101010",
+				 "101010101010101010101",
+		         "010101010101010101010",
+				 "101010101010101010101",
+		         "010101010101010101010",
+				 "101010101010101010101",
+		         "010101010101010101010",
+				 "101010101010101010101"]
 	lines = runlength_encode(lines)
 	lines = [int(line, 2) for line in lines]
 	
@@ -90,15 +110,6 @@ def chunks(l, n):
 	for i in range(0, len(l), n):
 		yield l[i:i + n]
 
-# Initialisation code
-lineNum = init_start
-print("%d DIM e(95)" % (lineNum))
-lineNum+=1
-print("%d RESTORE" % (lineNum))
-lineNum+=1
-print("%d FOR n=1 TO 95: READ e(n): NEXT n" % (lineNum))
-lineNum+=1
-
 # Character printing function
 fontdata = []
 lut = {}
@@ -108,37 +119,32 @@ for c in range(32, 127):
 	lut[c] = index
 	index += len(numbers)
 	fontdata += numbers
-#fontstrings = [",".join(hex(num)[2:]+'h' for num in fontslice) for fontslice in chunks(fontdata, 20)]
-fontstrings = [",".join(str(num) for num in fontslice) for fontslice in chunks(fontdata, 20)]
 
-# Load `index` numbers into f
-print("%d DIM f(%d)" % (lineNum, index))
+# Initialisation code
+lineNum = init_start
+print("%d DIM e(95)" % (lineNum))
 lineNum+=1
-print("%d RESTORE" % (lineNum))
+print("%d RESTORE %d" % (lineNum, lineNum))
 lineNum+=1
-print("%d FOR n=1 TO %d: READ f(n): NEXT n" % (lineNum, index))
+print("%d FOR n=1 TO 95: READ e(n): NEXT n" % (lineNum))
 lineNum+=1
-
-assert lineNum <= printchar_start
-
-lineNum = printchar_start
-print("%d LPRINT CHR$ 13+CHR$ 10" % (lineNum))
-lineNum +=1
-print("%d LET i=CODE a$-31" % (lineNum))
-lineNum +=1
-print("%d LET j=e(i)" % (lineNum)) # Get the index of the character start
-lineNum +=1
-lineloop_linenum = lineNum
-print("%d LET b=f(j)" % (lineNum)) # Get the character start number
-lineNum +=1
-print("%d LPRINT CHR$ 13+CHR$ 10" % (lineNum))
+print("%d DATA %s" % (lineNum, ','.join([str(lut[c]) for c in range(32, 127)])))
 lineNum +=1
 print("%d RETURN" % (lineNum))
 lineNum +=1
-print("%d DATA %s" % (lineNum, ','.join([str(lut[c]) for c in range(32, 127)])))
-lineNum +=1
-for fontstring in fontstrings:
-	print("%d DATA %s" % (lineNum, fontstring))
-	lineNum += 1
+
+
+def int_to_bytes(number):
+	b1 = number & 0xff
+	b2 = (number >> 8) & 0xff
+	b3 = (number >> 16) & 0xff
+	return bytes([b3,b2,b1])
+
+total_bytes = 0
+with open("fontdata.dat", "wb+") as fontfile:
+	for value in fontdata:
+		total_bytes += fontfile.write(int_to_bytes(value))
+
+print("Font file size: %d bytes" % (total_bytes), file=sys.stderr)
 
 # vim: set tabstop=4 noexpandtab:
