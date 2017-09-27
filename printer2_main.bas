@@ -1,7 +1,7 @@
 REM Initialisation
 REM Disable token mode
 COPY : REM CHR$ 0
-CLEAR 30000
+CLEAR 29400
 GO SUB loadfont
 GO SUB load_inflate_code
 LABEL: mainmenu
@@ -66,7 +66,7 @@ LPRINT "Unit 1, 35 Hospital Fields Road"+CHR$ 13+CHR$ 10+"York, YO10 4DZ"+CHR$ 1
 LPRINT "@yorkhackspace"+CHR$ 13+CHR$ 10
 LPRINT "https://york.hackspace.org.uk/"+CHR$ 13+CHR$ 10
 LPRINT CHR$ 29+"h"+CHR$ 60
-LPRINT CHR$ 29+"k"+CHR$ 73+CHR$ 13+CHR$ 123+CHR$ 66+"ERROR ERROR"
+LPRINT CHR$ 29+"k"+CHR$ 73+CHR$ 13+CHR$ 123+CHR$ 66+"yhs.mod3.uk"
 GO SUB feed
 RETURN
 
@@ -82,41 +82,37 @@ RETURN
 
 LABEL: printchar
 LET i= CODE a$-31
-LET charAddr=30000+e(i)
+LET charAddr=29400+e(i)
 LABEL: printchar_next
+REM "Poke the mark and the space characters"
+POKE 32575, 219
+POKE 32576, 32
 POKE 32597, PEEK charAddr
 POKE 32598, PEEK (charAddr+1)
 POKE 32599, PEEK (charAddr+2)
-PRINT "Char"
-PRINT charAddr
-PRINT PEEK charAddr
-PRINT PEEK (charAddr+1)
-PRINT PEEK (charAddr+2)
-LET charAddr= charAddr+1
-REM "LET r=USR 32475"
-LET r=1
+LET charAddr= charAddr+3
+LET r=USR 32475
 IF r=0 THEN GO TO printchar_next
+LPRINT CHR$ 10
+LPRINT CHR$ 10
 RETURN
 
 LABEL: loadfont
 PRINT "Loading font file"
-PRINT "please wait..."
+PRINT "Please wait..."
 REM Load the font file from the tape
 LOAD "font"CODE
+PRINT "Loading character index"
+PRINT "Please wait..."
 REM "read the line number data for the font into array e (autogen at line 600)"
 GO TO RAWLINE:600
 
 LABEL: load_inflate_code
 LOADASMDATA 32475 inflate_and_print
-REM "Poke the mark and the space characters"
-POKE 32575, 219
-POKE 32576, 32
 RETURN
 
 ASMDATASTART inflate_and_print
 # First we inflate the line
-ED5B3F7F # ld de, (7F3F)      ; d <= mark-char, e <= space-char
-213F7F   # ld hl, 7F3F        ; hl <= string-address
 # Build a stack of the character data to inflate
 010000   # ld bc, 0           ; A 0 to indicate the end of the data
 C5       # push bc            ; push the 0 on to the stack
@@ -133,6 +129,8 @@ C5       # push bc
 # First character to inflate
 3A557F   # ld a, (0x7F55)     ; a <= data[0]
 0608     # ld b, 8            ; b <= 8
+213F7F   # ld hl, 7F3F        ; hl <= string-address
+ED5B3F7F # ld de, (7F3F)      ; d <= mark-char, e <= space-char
 # inflateloop:
 CB27     # sla a              ; a <= a<<1, f.c <= a[7]
 72       # ld (hl), d
@@ -158,7 +156,7 @@ CD0116   # call 5633          ; open channel
 # printloop:
 C5       # push bc
 113f7F   # ld de, 0x7f3f      ; address of string
-011600   # ld bc, 22          ; length of string to print
+011500   # ld bc, 21          ; length of string to print
 CD3C20   # call 8252          ; print our string
 C1       # pop bc
 10F3     # djnz printloop     ; repeat for run length

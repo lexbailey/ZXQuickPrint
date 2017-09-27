@@ -64,18 +64,16 @@ def runlength_encode(lines):
 	run_length = 0
 	outlines = []
 	for i, line in enumerate(lines):
-		islast = i == len(lines) -1 
 		if line == curline and run_length < 4:
 			run_length += 1
 		else:
-			outlines.append(curline + encode_length(run_length, islast))
+			outlines.append(curline + encode_length(run_length, False))
 			run_length = 1
 			curline = line
-		if islast:
-			outlines.append(curline + encode_length(run_length, islast))
+	outlines.append(curline + encode_length(run_length, True))
 	return outlines
 
-def doChar(thisChar):
+def doChar(thisChar, offset):
 	output = ""
 	height = font.getsize(thisChar)[1]
 	width = 21
@@ -83,7 +81,7 @@ def doChar(thisChar):
 	
 	charImg = Image.new("1", size)
 	charDraw = ImageDraw.Draw(charImg)
-	charDraw.text((0,0), thisChar, "white", font=font)
+	charDraw.text((0, offset), thisChar, "white", font=font)
 	charImg = charImg.rotate(-90, expand=True)
 	start, end = startAndEndLines(charImg, width, height)
 	if thisChar == " ":
@@ -110,12 +108,34 @@ def chunks(l, n):
 	for i in range(0, len(l), n):
 		yield l[i:i + n]
 
+def find_offset():
+	offset = 0
+	add = False
+	sub = False
+	while True:
+		allnums = []
+		for c in range(32,127):
+			numbers = doChar(chr(c), offset)
+			allnums.extend(numbers)
+		if all((number & (2**(20+3)))==0 for number in allnums):
+			offset += 1
+			add = True
+		elif all((number & (2**(0+3)))==0 for number in allnums):
+			offset -= 1
+			sub = True
+		else:
+			break
+		if add and sub:
+			break
+	return offset
+
 # Character printing function
 fontdata = []
 lut = {}
 index = 0
+offset = find_offset()
 for c in range(32, 127):
-	numbers = doChar(chr(c))
+	numbers = doChar(chr(c), offset)
 	lut[c] = index
 	index += len(numbers)
 	fontdata += numbers
@@ -128,7 +148,7 @@ print("%d RESTORE %d" % (lineNum, lineNum))
 lineNum+=1
 print("%d FOR n=1 TO 95: READ e(n): NEXT n" % (lineNum))
 lineNum+=1
-print("%d DATA %s" % (lineNum, ','.join([str(lut[c]) for c in range(32, 127)])))
+print("%d DATA %s" % (lineNum, ','.join([str(lut[c]*3) for c in range(32, 127)])))
 lineNum +=1
 print("%d RETURN" % (lineNum))
 lineNum +=1
