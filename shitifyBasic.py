@@ -97,7 +97,11 @@ with open(filename) as infile:
                         fixups.append((len(outbuffer), prefix, action, destlabel))
                         outbuffer.append(None)
                 else:
-                    outbuffer.append(line)
+                    if not any([
+                            line.strip() == "",
+                            line.startswith("REM")
+                        ]):
+                        outbuffer.append(line)
             else:
                 labels.append((len(outbuffer), m.groups()[0].strip()))
         else:
