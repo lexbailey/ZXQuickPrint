@@ -4,9 +4,11 @@ COPY : REM CHR$ 0
 CLEAR 29400
 GO SUB loadfont
 GO SUB load_inflate_code
+LET f$=CHR$13+CHR$10
+LET t$=CHR$27
 LABEL: mainmenu
 REM Reset the printer
-LPRINT CHR$ 27 + "@"
+LPRINT t$ + "@"
 CLS
 BEEP 0.1, 23
 BEEP 0.1, 20
@@ -33,7 +35,7 @@ GO TO mainmenu
 REM print seven line feeds
 LABEL: feed
 FOR n=0 TO 6
-LPRINT CHR$ 13+CHR$ 10
+LPRINT f$
 NEXT n
 REM Cut the paper
 LPRINT CHR$ 29+"V1"
@@ -42,59 +44,60 @@ RETURN
 REM print a badge
 LABEL: printbadge
 INPUT "Type your name", m$
-LPRINT CHR$ 27+"!"+CHR$ 0
-LPRINT CHR$ 27+"a0"
+LPRINT t$+"!"+CHR$0
+LPRINT t$+"a0"
 LPRINT "       Hi, my name is"
-LPRINT CHR$ 13+CHR$ 10
+LPRINT f$
+REM "LPRINT CHR$ 13+CHR$ 10"
 REM Enable bold text
-LPRINT CHR$ 27+"E1"
+LPRINT t$+"E1"
 REM Large text mode
-LPRINT CHR$ 27+"!0"
+LPRINT t$+"!0"
 REM Justify centre
-LPRINT CHR$ 27+"a1"
+LPRINT t$+"a1"
 REM Print the name
 LPRINT m$
-LPRINT CHR$ 13+CHR$ 10
+LPRINT f$
 GO SUB feed
 RETURN
 
 LABEL: contactcard
-LPRINT CHR$ 27+"E1"+CHR$ 27+"!0"+CHR$ 27+"a1"
-LPRINT "York Hackspace"+CHR$ 13+CHR$ 10
-LPRINT CHR$ 27+"E0"+CHR$ 27+"!"+CHR$ 0
-LPRINT "Unit 1, 35 Hospital Fields Road"+CHR$ 13+CHR$ 10+"York, YO10 4DZ"+CHR$ 13+CHR$ 10
-LPRINT "@yorkhackspace"+CHR$ 13+CHR$ 10
-LPRINT "https://york.hackspace.org.uk/"+CHR$ 13+CHR$ 10
+LPRINT t$+"E1"+t$+"!0"+t$+"a1"
+LPRINT "York Hackspace"+f$
+LPRINT t$+"E0"+t$+"!"+CHR$ 0
+LPRINT "Unit 1, 35 Hospital Fields Road"+f$+"York, YO10 4DZ"+f$
+LPRINT "@yorkhackspace"+f$
+LPRINT "https://york.hackspace.org.uk/"+f$
 LPRINT CHR$ 29+"h"+CHR$ 60
 LPRINT CHR$ 29+"k"+CHR$ 73+CHR$ 13+CHR$ 123+CHR$ 66+"yhs.mod3.uk"
 GO SUB feed
 RETURN
 
 LABEL: banner
-INPUT "Enter banner text", t$
-LPRINT CHR$ 27+"E1"+CHR$ 27+"! "+CHR$ 27+"a0"
-FOR c=1 TO LEN t$
-LET a$=t$(c TO c)
+INPUT "Enter banner text", b$
+LPRINT t$+"E1"+t$+"! "+t$+"a0"
+FOR c=1 TO LEN b$
+LET a$=b$(c TO c)
 GO SUB printchar
 NEXT c
 GO SUB feed
 RETURN
 
 LABEL: printchar
-LET i= CODE a$-31
-LET charAddr=29400+e(i)
+LET i=CODE a$-31
+LET v=29400+e(i)
 LABEL: printchar_next
 REM "Poke the mark and the space characters"
 POKE 32575, 219
 POKE 32576, 32
-POKE 32597, PEEK charAddr
-POKE 32598, PEEK (charAddr+1)
-POKE 32599, PEEK (charAddr+2)
-LET charAddr= charAddr+3
+POKE 32597, PEEK v
+POKE 32598, PEEK (v+1)
+POKE 32599, PEEK (v+2)
+LET v=v+3
 LET r=USR 32475
 IF r=0 THEN GO TO printchar_next
-LPRINT CHR$ 10
-LPRINT CHR$ 10
+LPRINT f$
+LPRINT f$
 RETURN
 
 LABEL: loadfont

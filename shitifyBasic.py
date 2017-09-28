@@ -63,6 +63,15 @@ with open(filename) as infile:
                 thisasm.append(line)
 
 
+linegroup = []
+def flush():
+    global outbuffer, linegroup
+    if linegroup == []:
+        return
+    assert not None in linegroup
+    outbuffer.append("%s\n" % (':'.join(line.strip() for line in linegroup)))
+    linegroup = []
+
 inasm = False
 with open(filename) as infile:
     while True:
@@ -79,6 +88,7 @@ with open(filename) as infile:
                 dest = int(dest)
                 name = name.strip()
                 limit = dest + len(asms[name])-1
+                flush()
                 outbuffer.append("RESTORE %d\n" % (len(outbuffer)+1))
                 outbuffer.append("DATA %s\n" % (','.join(str(asm) for asm in asms[name])))
                 outbuffer.append("FOR c=%d TO %d\n" % (dest, limit))
@@ -92,8 +102,10 @@ with open(filename) as infile:
                     prefix, action, destlabel = m.groups()
                     if destlabel.startswith("RAWLINE:"):
                         destline = destlabel[8:]
+                        flush()
                         outbuffer.append("%sGO %s %s\n" % (prefix, action, destline))
                     else:
+                        flush()
                         fixups.append((len(outbuffer), prefix, action, destlabel))
                         outbuffer.append(None)
                 else:
@@ -101,11 +113,17 @@ with open(filename) as infile:
                             line.strip() == "",
                             line.startswith("REM")
                         ]):
-                        outbuffer.append(line)
+                        if "REM" in line:
+                            flush()
+                            outbuffer.append(line)
+                        else:
+                            linegroup.append(line)
             else:
+                flush()
                 labels.append((len(outbuffer), m.groups()[0].strip()))
         else:
             break
+    flush()
 
 
 def label_to_num(targetlabel):

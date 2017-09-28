@@ -8,7 +8,7 @@ DEFAULT_FONT=/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf
 bin2tap/bin2tap:
 	$(MAKE) bin2tap -C bin2tap
 
-%.bas.shit: %.bas
+%.bas.shit: %.bas $(SHITIFY)
 	$(SHITIFY) $<
 
 printer2.bas: printer2_main.bas.shit font.bas
