@@ -47,20 +47,11 @@ RETURN
 REM print a badge
 LABEL: printbadge
 INPUT "Type your name", m$
-LPRINT t$+"!"+CHR$0
-LPRINT t$+"a0"
-LPRINT "       Hi, my name is"
-LPRINT f$
-REM "LPRINT CHR$ 13+CHR$ 10"
-REM Enable bold text
-LPRINT t$+"E1"
-REM Large text mode
-LPRINT t$+"!0"
-REM Justify centre
-LPRINT t$+"a1"
+LPRINT t$+"!"+CHR$0+t$+"a0       Hi, my name is"+f$
+REM Large bold text, centre justify
+LPRINT t$+"E1"+t$+"!0"+t$+"a1"
 REM Print the name
-LPRINT m$
-LPRINT f$
+LPRINT m$+f$
 GO SUB feed
 RETURN
 
