@@ -4,6 +4,7 @@ BAS2TAP=~/bin/bas2tap/bas2tap
 BAS2TAPOPTS=-r -s"printer2"
 SHITIFY=./shitifyBasic.py
 DEFAULT_FONT=/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf
+FONTLOCATION=29100
 DEBUG=
 
 bin2tap/bin2tap:
@@ -25,19 +26,22 @@ printer2_autostart.tap: printer2.bas
 	$(BAS2TAP) -a1 $(BAS2TAPOPTS) $< $@
 
 default_font.tap: fontdata.dat bin2tap/bin2tap
-	./$(word 2,$^) 29300 "font" $<
+	./$(word 2,$^) $(FONTLOCATION) "font" $<
 	mv $<.tap $@
 
 altfonts/%_altfont.dat.tap: altfonts/%_altfont.dat bin2tap/bin2tap
-	./$(word 2,$^) 29300 "$(subst _altfont.dat.tap,,$(notdir $@))" $<
+	./$(word 2,$^) $(FONTLOCATION) "$(subst _altfont.dat.tap,,$(notdir $@))" $<
 
 fulltape.tap: printer2_autostart.tap default_font.tap
 	cat $^ > $@
 
-allfonts: generateFont.py
+allfonts.tap: generateFont.py
 	mkdir -p altfonts
 	-cd altfonts && fc-list | grep .ttf | grep -iv "Comic Sans" | grep -iv "Kacst" | grep -iv "ume-" | grep -iv "lklug" | sed -e "s/^\([^:]*\).*/\\1/" | xargs -n1 ../$<
-	-ls altfonts | xargs -I{} -n1 make altfonts/{}.tap
-	cat altfonts/*.tap >> allfonts.tap
+	-ls altfonts/*.dat | xargs -I{} -n1 make altfonts/{}.tap
+	cat altfonts/*.tap > allfonts.tap
 
-.PHONY: allfonts bin2tap/bin2tap
+megatape.tap: fulltape.tap allfonts.tap
+	cat $^ > $@
+
+.PHONY: bin2tap/bin2tap

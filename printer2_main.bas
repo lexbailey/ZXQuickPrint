@@ -1,8 +1,8 @@
 REM Initialisation
 REM Disable token mode
 COPY : REM CHR$ 0
-CLEAR 29300
-LET o=29300
+CLEAR 29100
+LET o=29100
 LET p=o+190
 DIM e(95)
 REM Default font name
