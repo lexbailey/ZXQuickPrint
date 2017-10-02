@@ -4,17 +4,18 @@ BAS2TAP=~/bin/bas2tap/bas2tap
 BAS2TAPOPTS=-r -s"printer2"
 SHITIFY=./shitifyBasic.py
 DEFAULT_FONT=/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf
+DEBUG=
 
 bin2tap/bin2tap:
 	$(MAKE) bin2tap -C bin2tap
 
 %.bas.shit: %.bas $(SHITIFY)
-	$(SHITIFY) $<
+	$(SHITIFY) $< $(DEBUG)
 
-printer2.bas: printer2_main.bas.shit font.bas
+printer2.bas: printer2_main.bas.shit
 	cat $^ > $@
 
-font.bas: generateFont.py
+fontdata.dat: generateFont.py
 	./$< $(DEFAULT_FONT) > $@
 
 printer2.tap: printer2.bas
@@ -24,7 +25,7 @@ printer2_autostart.tap: printer2.bas
 	$(BAS2TAP) -a1 $(BAS2TAPOPTS) $< $@
 
 default_font.tap: fontdata.dat bin2tap/bin2tap
-	./$(word 2,$^) 29400 "font" $<
+	./$(word 2,$^) 29300 "font" $<
 	mv $<.tap $@
 
 fulltape.tap: printer2_autostart.tap default_font.tap

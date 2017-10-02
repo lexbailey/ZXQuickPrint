@@ -12,10 +12,13 @@ from math import floor
 
 parser = argparse.ArgumentParser(description='Shitfy BASIC-like code')
 parser.add_argument('file', type=str)
+parser.add_argument('--debug', action="store_true")
 args = parser.parse_args()
 
 filename = args.file
 outfilename = filename + ".shit"
+
+debug = args.debug
 
 linenum = 0
 
@@ -118,6 +121,8 @@ with open(filename) as infile:
                             outbuffer.append(line)
                         else:
                             linegroup.append(line)
+                            if debug:
+                                flush()
             else:
                 flush()
                 labels.append((len(outbuffer), m.groups()[0].strip()))

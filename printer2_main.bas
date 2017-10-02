@@ -1,7 +1,10 @@
 REM Initialisation
 REM Disable token mode
 COPY : REM CHR$ 0
-CLEAR 29400
+CLEAR 29300
+LET o=29300
+LET p=o+190
+DIM e(95)
 GO SUB loadfont
 GO SUB load_inflate_code
 LET f$=CHR$13+CHR$10
@@ -85,7 +88,8 @@ RETURN
 
 LABEL: printchar
 LET i=CODE a$-31
-LET v=29400+e(i)
+LET v=p
+LET v=p+e(i)
 LABEL: printchar_next
 REM "Poke the mark and the space characters"
 POKE 32575, 219
@@ -107,8 +111,11 @@ REM Load the font file from the tape
 LOAD "font"CODE
 PRINT "Loading character index"
 PRINT "Please wait..."
-REM "read the line number data for the font into array e (autogen at line 600)"
-GO TO RAWLINE:600
+DIM e(95)
+FOR i=1 TO 95
+LET e(i)=(PEEK (o+(2*(i-1))))+((PEEK (o+(2*(i-1))+1))*256)
+NEXT i
+RETURN
 
 LABEL: load_inflate_code
 LOADASMDATA 32475 inflate_and_print

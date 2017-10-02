@@ -90,14 +90,15 @@ def doChar(thisChar, offset):
 	for y in range(start, end):
 		lines.append("".join("1" if charImg.getpixel((x, y)) else "0" for x in range(width)))
 	if lines == []:
-		lines = ["010101010101010101010",
-				 "101010101010101010101",
-		         "010101010101010101010",
-				 "101010101010101010101",
-		         "010101010101010101010",
-				 "101010101010101010101",
-		         "010101010101010101010",
-				 "101010101010101010101"]
+		lines = ["000000000000000000000",
+				 "000000000000000000000",
+				 "000000000000000000000",
+				 "000000000010000000000",
+				 "000000000000000000000",
+				 "000000000000000000000",
+				 "000000000000000000000",
+				 "000000000000000000000"
+				 ]
 	lines = runlength_encode(lines)
 	lines = [int(line, 2) for line in lines]
 	
@@ -140,19 +141,14 @@ for c in range(32, 127):
 	index += len(numbers)
 	fontdata += numbers
 
-# Initialisation code
-lineNum = init_start
-print("%d DIM e(95)" % (lineNum))
-lineNum+=1
-print("%d RESTORE %d" % (lineNum, lineNum))
-lineNum+=1
-print("%d FOR n=1 TO 95: READ e(n): NEXT n" % (lineNum))
-lineNum+=1
-print("%d DATA %s" % (lineNum, ','.join([str(lut[c]*3) for c in range(32, 127)])))
-lineNum +=1
-print("%d RETURN" % (lineNum))
-lineNum +=1
+def charindex_block(charindex):
+	block = []
+	for i in charindex:
+		block.append(i & 0xff)
+		block.append(i>>8)
+	return bytes(block)
 
+charindex = [lut[c]*3 for c in range(32, 127)]
 
 def int_to_bytes(number):
 	b1 = number & 0xff
@@ -162,6 +158,7 @@ def int_to_bytes(number):
 
 total_bytes = 0
 with open("fontdata.dat", "wb+") as fontfile:
+	total_bytes += fontfile.write(charindex_block(charindex))
 	for value in fontdata:
 		total_bytes += fontfile.write(int_to_bytes(value))
 
