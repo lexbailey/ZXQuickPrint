@@ -16,7 +16,7 @@ printer2.bas: printer2_main.bas.shit
 	cat $^ > $@
 
 fontdata.dat: generateFont.py
-	./$< $(DEFAULT_FONT) > $@
+	./$< $(DEFAULT_FONT) -o $@
 
 printer2.tap: printer2.bas
 	$(BAS2TAP) $(BAS2TAPOPTS) $< $@
@@ -28,10 +28,16 @@ default_font.tap: fontdata.dat bin2tap/bin2tap
 	./$(word 2,$^) 29300 "font" $<
 	mv $<.tap $@
 
+altfonts/%_altfont.dat.tap: altfonts/%_altfont.dat bin2tap/bin2tap
+	./$(word 2,$^) 29300 "$(subst _altfont.dat.tap,,$(notdir $@))" $<
+
 fulltape.tap: printer2_autostart.tap default_font.tap
 	cat $^ > $@
 
 allfonts: generateFont.py
-	fc-list | grep .ttf | grep -iv "Comic Sans" | sed -e "s/^\([^:]*\).*/\\1/" | xargs -n1 ./$<
+	mkdir -p altfonts
+	-cd altfonts && fc-list | grep .ttf | grep -iv "Comic Sans" | grep -iv "Kacst" | grep -iv "ume-" | grep -iv "lklug" | sed -e "s/^\([^:]*\).*/\\1/" | xargs -n1 ../$<
+	-ls altfonts | xargs -I{} -n1 make altfonts/{}.tap
+	cat altfonts/*.tap >> allfonts.tap
 
 .PHONY: allfonts bin2tap/bin2tap

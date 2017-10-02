@@ -5,6 +5,8 @@ CLEAR 29300
 LET o=29300
 LET p=o+190
 DIM e(95)
+REM Default font name
+LET h$="font"
 GO SUB loadfont
 GO SUB load_inflate_code
 LET f$=CHR$13+CHR$10
@@ -21,9 +23,10 @@ PRINT "Printer main menu"
 PRINT " * N - Name badge"
 PRINT " * B - Banner"
 PRINT " * C - YHS contact card"
+PRINT " * F - Load a different font"
 PRINT ""
 PRINT ""
-PRINT "Type N, B or C"
+PRINT "Type N, B, C or F"
 LABEL: inputloop
 LET s$=INKEY$
 IF s$="" THEN GO TO inputloop
@@ -31,9 +34,15 @@ LABEL: waitloop
 IF INKEY$<>"" THEN GO TO waitloop
 IF s$="n" OR s$="N" THEN GO SUB printbadge
 IF s$="b" OR s$="B" THEN GO SUB banner
-IF s$="c" OR s$="c" THEN GO SUB contactcard
+IF s$="c" OR s$="C" THEN GO SUB contactcard
+IF s$="f" OR s$="F" THEN GO SUB newfont
 IF s$="e" OR s$="E" THEN STOP
 GO TO mainmenu
+
+LABEL: newfont
+INPUT "Type the font file name...", h$
+GO SUB loadfont
+RETURN
 
 REM print seven line feeds
 LABEL: feed
@@ -99,7 +108,7 @@ LABEL: loadfont
 PRINT "Loading font file"
 PRINT "Please wait..."
 REM Load the font file from the tape
-LOAD "font"CODE
+LOAD h$ CODE
 PRINT "Loading character index"
 PRINT "Please wait..."
 DIM e(95)

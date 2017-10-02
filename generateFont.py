@@ -14,7 +14,9 @@ import argparse
 
 parser = argparse.ArgumentParser(description='Font generator.')
 parser.add_argument('fontfile', help='Path to font')
+parser.add_argument('-o', help='Output file name')
 args = parser.parse_args()
+outname=args.o
 print(args.fontfile, file=sys.stderr)
 
 #font = ImageFont.truetype("/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf", 21)
@@ -157,7 +159,9 @@ def int_to_bytes(number):
 	return bytes([b3,b2,b1])
 
 total_bytes = 0
-with open("fontdata.dat", "wb+") as fontfile:
+if not outname:
+	outname = name+"_altfont.dat"
+with open(outname, "wb+") as fontfile:
 	total_bytes += fontfile.write(charindex_block(charindex))
 	for value in fontdata:
 		total_bytes += fontfile.write(int_to_bytes(value))
