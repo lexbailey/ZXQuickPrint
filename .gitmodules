@@ -1,3 +1,6 @@
 [submodule "bin2tap"]
 	path = bin2tap
 	url = git@github.com:danieljabailey/bin2tap.git
+[submodule "bas2tap"]
+	path = bas2tap
+	url = git@github.com:danieljabailey/bas2tap.git
