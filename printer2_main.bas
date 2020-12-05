@@ -22,7 +22,6 @@ BEEP 0.1, 29
 PRINT "Printer main menu"
 PRINT " * N - Name badge"
 PRINT " * B - Banner"
-PRINT " * C - YHS contact card"
 PRINT " * F - Load a different font"
 PRINT ""
 PRINT ""
@@ -34,7 +33,6 @@ LABEL: waitloop
 IF INKEY$<>"" THEN GO TO waitloop
 IF s$="n" OR s$="N" THEN GO SUB printbadge
 IF s$="b" OR s$="B" THEN GO SUB banner
-IF s$="c" OR s$="C" THEN GO SUB contactcard
 IF s$="f" OR s$="F" THEN GO SUB newfont
 IF s$="e" OR s$="E" THEN STOP
 GO TO mainmenu
@@ -61,18 +59,6 @@ REM Large bold text, centre justify
 LPRINT t$+"E1"+t$+"!0"+t$+"a1"
 REM Print the name
 LPRINT m$+f$
-GO SUB feed
-RETURN
-
-LABEL: contactcard
-LPRINT t$+"E1"+t$+"!0"+t$+"a1"
-LPRINT "York Hackspace"+f$
-LPRINT t$+"E0"+t$+"!"+CHR$ 0
-LPRINT "Unit 1, 35 Hospital Fields Road"+f$+"York, YO10 4DZ"+f$
-LPRINT "@yorkhackspace"+f$
-LPRINT "https://york.hackspace.org.uk/"+f$
-LPRINT CHR$ 29+"h"+CHR$ 60
-LPRINT CHR$ 29+"k"+CHR$ 73+CHR$ 13+CHR$ 123+CHR$ 66+"yhs.mod3.uk"
 GO SUB feed
 RETURN
 
