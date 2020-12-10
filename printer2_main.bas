@@ -95,8 +95,8 @@ PRINT "Loading font file"
 PRINT "Please wait..."
 REM Load the font file from the tape
 LOAD h$ CODE
-PRINT "Loading character index"
-PRINT "Please wait..."
+PRINT "You can STOP THE TAPE now."
+PRINT "Initialising character index..."
 DIM e(95)
 FOR i=1 TO 95
 LET e(i)=(PEEK (o+(2*(i-1))))+((PEEK (o+(2*(i-1))+1))*256)
